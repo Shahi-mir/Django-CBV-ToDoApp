@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>مدیریت تسک‌ها</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 32px 16px;
+            background: #f3f5f9;
+            color: #1f2937;
+            font-family: Tahoma, Arial, sans-serif;
+        }
+
+        .container {
+            width: min(900px, 100%);
+            margin: 0 auto;
+        }
+
+        h1 {
+            margin: 0 0 24px;
+            font-size: 27px;
+        }
+
+        .panel {
+            padding: 22px;
+            margin-bottom: 22px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            box-shadow: 0 4px 14px #1118270a;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 190px;
+            gap: 12px;
+        }
+
+        .form-grid .full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        input,
+        textarea,
+        select,
+        button {
+            width: 100%;
+            min-height: 42px;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font: inherit;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        button {
+            border: 0;
+            color: #fff;
+            background: #2563eb;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        .task-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .task-card {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 190px;
+            align-items: center;
+            gap: 18px;
+            padding: 18px;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+        }
+
+        .task-card.completed {
+            background: #f8fafc;
+            opacity: 0.78;
+        }
+
+        .task-title {
+            margin: 0 0 8px;
+            font-size: 18px;
+            overflow-wrap: anywhere;
+        }
+
+        .completed .task-title {
+            text-decoration: line-through;
+        }
+
+        .task-description {
+            margin: 0 0 10px;
+            color: #64748b;
+            line-height: 1.7;
+            overflow-wrap: anywhere;
+        }
+
+        .task-status {
+            color: #475569;
+            font-size: 13px;
+        }
+
+        .task-controls {
+            display: grid;
+            gap: 10px;
+        }
+
+        .task-controls form {
+            margin: 0;
+        }
+
+        .secondary-button {
+            background: #475569;
+        }
+
+        .secondary-button:hover {
+            background: #334155;
+        }
+
+        .empty-state {
+            padding: 24px;
+            color: #64748b;
+            text-align: center;
+            background: #fff;
+            border: 1px dashed #cbd5e1;
+            border-radius: 12px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 20px 12px;
+            }
+
+            .form-grid,
+            .task-card {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <h1>مدیریت تسک‌ها</h1>
+
+        <section class="panel">
+            <h2>ساخت تسک جدید</h2>
+
+            <form method="post" action="{% url 'task_create' %}">
+                {% csrf_token %}
+
+                <div class="form-grid">
+                    <div>
+                 <label for="title">عنوان</label>
+                        <input
+                            id="title"
+                            name="title"
+                            type="text"
+                            maxlength="100"
+                            required
+                            placeholder="عنوان تسک را بنویسید"
+                        >
+                    </div>
+                    <div>
+                        <label for="priority">اولویت</label>
+                        <select id="priority" name="priority">
+                            {% for value, label in priority_choices %}
+                                <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="full-width">
+                        <label for="description">توضیحات</label>
+                        <textarea
+                            id="description"
+                            name="description"
+                            placeholder="توضیحات اختیاری"
+                        ></textarea>
+                    </div>
+
+                    <div class="full-width">
+                        <button type="submit">ساخت تسک</button>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <section>
+            <h2>تسک‌ها</h2>
+
+            {% if tasks %}
+                <div class="task-list">
+                    {% for task in tasks %}
+                        <article class="task-card {% if task.completed %}completed{% endif %}">
+                            <div>
+                                <h3 class="task-title">{{ task.title }}</h3>
+
+                                {% if task.description %}
+                                    <p class="task-description">{{ task.description }}</p>
+                                {% endif %}
+
+                                <div class="task-status">
+                                    وضعیت:
+                                    {% if task.completed %}انجام‌شده{% else %}در انتظار{% endif %}
+                                    · اولویت: {{ task.get_priority_display }}
+                                </div>
+                            </div>
+
+                            <div class="task-controls">
+                                <form method="post" action="{% url 'task_update' task.id %}">
+                                    {% csrf_token %}
+                                    <button
+                                        class="secondary-button"
+                                        type="submit"
+                                        name="toggle_completed"
+                                        value="1"
+                                    >
+                                        {% if task.completed %}علامت‌گذاری به‌عنوان در انتظار{% else %}علامت‌گذاری به‌عنوان انجام‌شده{% endif %}
+                                    </button>
+                                </form>
+
+                                <form method="post" action="{% url 'task_update' task.id %}">
+                                    {% csrf_token %}
+                                    <label for="priority-{{ task.id }}">تغییر اولویت</label>
+                                    <select
+                                        id="priority-{{ task.id }}"
+                                        name="priority"
+                                        onchange="this.form.submit()"
+                                    >
+                                        {% for value, label in priority_choices %}
+                                            <option value="{{ value }}" {% if task.priority == value %}selected{% endif %}>
+                                                {{ label }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </form>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    هنوز هیچ تسکی ثبت نشده؛ از فرم بالا اولین تسک را بساز.
+                </div>
+            {% endif %}
+        </section>
+    </main>
+    <form method="POST" action="{% url 'accounts:logout' %}" style="display: inline;">
+    {% csrf_token %}
+    <button type="submit">خروج از حساب</button>
+</form>
+</body>
+</html>

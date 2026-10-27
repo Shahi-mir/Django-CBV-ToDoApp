@@ -37,6 +37,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+    "ToDo.apps.TodoConfig",
+    "accounts.apps.AccountsConfig",
+    
 ]
 
 MIDDLEWARE = [
@@ -125,3 +129,4 @@ MAILERS = {
         "BACKEND": "django.core.mail.backends.console.EmailBackend",
     },
 }
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
