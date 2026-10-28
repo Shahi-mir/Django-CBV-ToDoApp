@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>حذف تسک</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: #f1f5f9;
+      color: #1e293b;
+      font-family: Tahoma, Arial, sans-serif;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 440px;
+      padding: 32px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      box-shadow: 0 12px 35px rgb(15 23 42 / 8%);
+      text-align: center;
+    }
+
+    .icon {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 18px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #fee2e2;
+      color: #dc2626;
+      font-size: 28px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 22px;
+    }
+
+    .message {
+      margin: 0 0 10px;
+      color: #64748b;
+      line-height: 1.9;
+    }
+
+    .task-name {
+      margin: 18px 0 24px;
+      padding: 12px;
+      overflow-wrap: anywhere;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      font-weight: bold;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .button {
+      flex: 1;
+      padding: 12px 16px;
+      border: 0;
+      border-radius: 9px;
+      font: inherit;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .delete-button {
+      background: #dc2626;
+      color: #fff;
+    }
+
+    .delete-button:hover {
+      background: #b91c1c;
+    }
+
+    .cancel-button {
+      background: #e2e8f0;
+      color: #334155;
+    }
+
+    .cancel-button:hover {
+      background: #cbd5e1;
+    }
+
+    @media (max-width: 380px) {
+      .actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <div class="icon" aria-hidden="true">!</div>
+
+    <h1>حذف تسک</h1>
+    <p class="message">آیا مطمئنی می‌خواهی این تسک را حذف کنی؟</p>
+
+    <div class="task-name">{{ task }}</div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="actions">
+        <button class="button delete-button" type="submit">بله، حذف شود</button>
+        <a class="button cancel-button" href="{% url 'task_list' %}">انصراف</a>
+      </div>
+    </form>
+  </main>
+</body>
+</html>
